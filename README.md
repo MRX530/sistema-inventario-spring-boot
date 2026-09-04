@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sistema de Gestión de Inventario
 
 Proyecto de portafolio: sistema web genérico de inventario con múltiples usuarios,
@@ -160,3 +161,7 @@ encriptar el password al guardar (`encode()`) y compararlo al hacer login
 - Agregar roles reales a la autorización (que solo ADMIN pueda borrar productos)
 - Agregar tests de integración con una base de datos en memoria (H2)
 - Refresh tokens, para no forzar re-login cada 8 horas
+=======
+# sistema-inventario-spring-boot
+Sistema de gestión de inventario con control de stock, reportes y autenticación JWT. Java + Spring Boot + MySQL.
+>>>>>>> 707a18ee6b4cb3ffa30e498222395a3f867511ac
