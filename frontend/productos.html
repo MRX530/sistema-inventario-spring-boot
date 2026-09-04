@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario - Productos</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f3f4f6; }
+        .bajo { color: #dc2626; font-weight: bold; }
+        input, select { padding: 6px; margin: 4px 4px 4px 0; }
+        button { padding: 8px 14px; background: #2563eb; color: white; border: none; cursor: pointer; }
+        .form-box { background: #f9fafb; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Productos <span id="usuarioActual" style="font-size:14px; color:#666;"></span></h2>
+
+    <div class="form-box">
+        <h3>Nuevo producto</h3>
+        <input id="nombre" placeholder="Nombre">
+        <input id="precio" type="number" placeholder="Precio">
+        <input id="stockActual" type="number" placeholder="Stock actual">
+        <input id="stockMinimo" type="number" placeholder="Stock mínimo">
+        <input id="categoriaId" type="number" placeholder="ID Categoría">
+        <button onclick="crearProducto()">Agregar</button>
+    </div>
+
+    <table id="tabla">
+        <thead>
+            <tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Mínimo</th><th>Acción</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+    </table>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('usuarioActual').innerText =
+            '— ' + (sessionStorage.getItem('usuarioNombre') || 'invitado');
+
+        async function cargarProductos() {
+            const productos = await apiGet('/productos');
+            const tbody = document.getElementById('tbody');
+            tbody.innerHTML = '';
+            productos.forEach(p => {
+                const bajo = p.stockActual < p.stockMinimo;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${p.id}</td>
+                        <td>${p.nombre}</td>
+                        <td>$${p.precio}</td>
+                        <td class="${bajo ? 'bajo' : ''}">${p.stockActual}${bajo ? ' ⚠' : ''}</td>
+                        <td>${p.stockMinimo}</td>
+                        <td>
+                            <button onclick="registrarMovimiento(${p.id}, 'ENTRADA')">+ Entrada</button>
+                            <button onclick="registrarMovimiento(${p.id}, 'SALIDA')">- Salida</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function crearProducto() {
+            const producto = {
+                nombre: document.getElementById('nombre').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stockActual: parseInt(document.getElementById('stockActual').value),
+                stockMinimo: parseInt(document.getElementById('stockMinimo').value),
+                categoria: { id: parseInt(document.getElementById('categoriaId').value) }
+            };
+            await apiPost('/productos', producto);
+            cargarProductos();
+        }
+
+        async function registrarMovimiento(productoId, tipo) {
+            const cantidad = prompt('Cantidad a ' + (tipo === 'ENTRADA' ? 'ingresar' : 'retirar') + ':');
+            if (!cantidad) return;
+            const usuarioId = sessionStorage.getItem('usuarioId');
+            try {
+                await apiPost('/movimientos', {
+                    productoId, usuarioId: parseInt(usuarioId), tipo, cantidad: parseInt(cantidad)
+                });
+                cargarProductos();
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+
+        cargarProductos();
+    </script>
+</body>
+</html>

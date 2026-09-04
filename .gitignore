@@ -1,0 +1,20 @@
+# Java / Maven
+backend/target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config sensible (contraseñas de base de datos)
+backend/src/main/resources/application-local.properties
