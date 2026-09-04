@@ -3,6 +3,8 @@ package com.inventario.service;
 import com.inventario.model.Producto;
 import com.inventario.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,14 @@ public class ProductoService {
 
     public List<Producto> listarTodos() {
         return productoRepository.findAll();
+    }
+
+    // Pageable ya trae encapsulado: numero de pagina, tamaño de pagina y orden.
+    // JpaRepository.findAll(Pageable) traduce esto a "LIMIT x OFFSET y" en SQL,
+    // en vez de traer TODOS los productos y cortar la lista en Java (ineficiente
+    // con miles de registros).
+    public Page<Producto> listarPaginado(Pageable pageable) {
+        return productoRepository.findAll(pageable);
     }
 
     public Producto buscarPorId(Long id) {

@@ -123,9 +123,40 @@ es exactamente lo que un cliente evalúa cuando revisa tu código.
 - Relaciones entre entidades con JPA (`@ManyToOne`)
 - API REST consumida por un frontend real
 
-## Próximos pasos sugeridos (para robustecer el proyecto)
+## Mejoras aplicadas
 
-- Encriptar contraseñas con BCrypt en vez de guardarlas en texto plano
-- Agregar autenticación con JWT en vez de login simple
-- Agregar paginación en `GET /api/productos` para listas grandes
-- Agregar tests unitarios de `MovimientoService` (el caso de stock insuficiente)
+**Contraseñas encriptadas (BCrypt)**
+`UsuarioService` usa `PasswordEncoder` (configurado en `SecurityConfig`) para
+encriptar el password al guardar (`encode()`) y compararlo al hacer login
+(`matches()`). Nunca se guarda ni se compara texto plano.
+
+**Autenticación con JWT**
+- `POST /api/usuarios/login` ahora devuelve, además del usuario, un `token`.
+- El frontend (`js/api.js`) lo guarda en `sessionStorage` y lo manda en el
+  header `Authorization: Bearer <token>` en cada petición.
+- `JwtAuthFilter` intercepta cada request y valida el token antes de dejarlo pasar.
+- `SecurityConfig` deja públicas solo `/api/usuarios/login` y `/api/usuarios/registro`;
+  todo lo demás requiere token válido.
+- **Nota:** el registro de usuario se movió de `POST /api/usuarios` a
+  `POST /api/usuarios/registro`.
+
+**Paginación**
+- Nuevo endpoint: `GET /api/productos/pagina?page=0&size=10&sort=nombre`
+- Internamente usa `Pageable`, que Spring traduce a `LIMIT`/`OFFSET` en SQL —
+  no trae todos los productos a memoria para cortar la lista después.
+- El endpoint original `GET /api/productos` se mantiene sin cambios.
+
+**Tests unitarios**
+- `backend/src/test/java/com/inventario/service/MovimientoServiceTest.java`
+- Usa Mockito para simular los repositorios (no se conecta a MySQL real).
+- Cubre: salida con stock suficiente, salida con stock insuficiente (el caso
+  que lanza `StockInsuficienteException`), entrada de stock, y producto inexistente.
+- Para correrlos: `mvn test` desde la carpeta `backend/`.
+
+## Próximos pasos sugeridos (para seguir robusteciendo)
+
+- Mover la clave secreta de JWT (`JwtUtil`) a `application.properties` o una
+  variable de entorno, en vez de tenerla fija en el código
+- Agregar roles reales a la autorización (que solo ADMIN pueda borrar productos)
+- Agregar tests de integración con una base de datos en memoria (H2)
+- Refresh tokens, para no forzar re-login cada 8 horas

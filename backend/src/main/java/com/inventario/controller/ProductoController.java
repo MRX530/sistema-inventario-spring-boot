@@ -3,6 +3,10 @@ package com.inventario.controller;
 import com.inventario.model.Producto;
 import com.inventario.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,9 +19,23 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
+    // Se mantiene por compatibilidad con lo que ya usa el frontend actual
     @GetMapping
     public List<Producto> listar() {
         return productoService.listarTodos();
+    }
+
+    // Version paginada: /api/productos/pagina?page=0&size=10&sort=nombre
+    // page: numero de pagina (empieza en 0)
+    // size: cuantos productos por pagina
+    // sort: por que campo ordenar
+    @GetMapping("/pagina")
+    public Page<Producto> listarPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sort) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        return productoService.listarPaginado(pageable);
     }
 
     @GetMapping("/{id}")

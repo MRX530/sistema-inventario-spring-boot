@@ -24,6 +24,7 @@
             const password = document.getElementById('password').value;
             try {
                 const usuario = await apiPost('/usuarios/login', { email, password });
+                sessionStorage.setItem('token', usuario.token);
                 sessionStorage.setItem('usuarioId', usuario.id);
                 sessionStorage.setItem('usuarioNombre', usuario.nombre);
                 window.location.href = 'productos.html';
