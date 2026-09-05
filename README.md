@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 # Sistema de Gestión de Inventario
 
-Proyecto de portafolio: sistema web genérico de inventario con múltiples usuarios,
+sistema web genérico de inventario con múltiples usuarios,
 control de stock y reportes de movimientos.
 
 ## Arquitectura
@@ -21,10 +21,6 @@ Repository (acceso a datos, Spring Data JPA)
 Base de datos (MySQL)
 ```
 
-**Por qué esta separación importa:** cada capa solo conoce a la de al lado. Si mañana
-cambias el frontend por React, o la base de datos por PostgreSQL, el resto del sistema
-no se entera. Esto es justo lo que un cliente freelance espera ver en un proyecto serio.
-
 ## Modelo de datos
 
 - **Usuario** — pertenece a un **Rol** (ADMIN o EMPLEADO)
@@ -32,8 +28,6 @@ no se entera. Esto es justo lo que un cliente freelance espera ver en un proyect
 - **Producto** — tiene stock actual y stock mínimo
 - **Movimiento** — registra cada entrada/salida de stock, ligado a un Producto y a un Usuario
 
-La tabla `Movimiento` es la pieza clave: sin ella solo sabrías el stock *actual*,
-pero no podrías generar reportes históricos.
 
 ## Estructura de carpetas
 
@@ -70,9 +64,6 @@ En `MovimientoService.registrarMovimiento()`:
 3. La operación está marcada `@Transactional`: actualiza el producto Y crea el
    movimiento como una sola unidad — si algo falla a mitad de camino, todo se revierte
    (no queda el stock actualizado sin el registro del movimiento, o viceversa).
-
-Este tipo de regla — "no dejar que el sistema quede en un estado inconsistente" —
-es exactamente lo que un cliente evalúa cuando revisa tu código.
 
 ## Cómo correrlo
 
@@ -116,14 +107,6 @@ es exactamente lo que un cliente evalúa cuando revisa tu código.
 | GET    | /api/movimientos/reporte      | Movimientos entre dos fechas           |
 | POST   | /api/usuarios/login             | Login de usuario                       |
 
-## Qué mostrar de este proyecto en tu portafolio/perfil freelance
-
-- Arquitectura en capas bien separada (no todo en un solo archivo)
-- Regla de negocio real con validación (stock insuficiente)
-- Manejo centralizado de errores (`@RestControllerAdvice`)
-- Relaciones entre entidades con JPA (`@ManyToOne`)
-- API REST consumida por un frontend real
-
 ## Mejoras aplicadas
 
 **Contraseñas encriptadas (BCrypt)**
@@ -154,14 +137,6 @@ encriptar el password al guardar (`encode()`) y compararlo al hacer login
   que lanza `StockInsuficienteException`), entrada de stock, y producto inexistente.
 - Para correrlos: `mvn test` desde la carpeta `backend/`.
 
-## Próximos pasos sugeridos (para seguir robusteciendo)
-
-- Mover la clave secreta de JWT (`JwtUtil`) a `application.properties` o una
-  variable de entorno, en vez de tenerla fija en el código
-- Agregar roles reales a la autorización (que solo ADMIN pueda borrar productos)
-- Agregar tests de integración con una base de datos en memoria (H2)
-- Refresh tokens, para no forzar re-login cada 8 horas
 =======
 # sistema-inventario-spring-boot
 Sistema de gestión de inventario con control de stock, reportes y autenticación JWT. Java + Spring Boot + MySQL.
->>>>>>> 707a18ee6b4cb3ffa30e498222395a3f867511ac
